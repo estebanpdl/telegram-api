@@ -12,7 +12,7 @@ nb/*
 
 # venv
 venv/
-
+*/venv/
 # session_file.session
 session_file.session
 session_file.session-journal
@@ -22,6 +22,7 @@ telegram_tracker/session-journal
 # files
 test.py
 chatgpt.pyi
+pyrightconfig.json
 
 # local build
 build/

@@ -180,9 +180,6 @@ def main():
 
         testing = { 'msg': [] }
 
-        pre_sort = {} 
-        post_sort = {}
-
         for idx, item in enumerate(messages):
             '''
 
@@ -190,22 +187,14 @@ def main():
             '''
             if item['_'] == 'Message':
 
-                # ----- START ------ #
-                #  Memory Profiling  #
-                # ################## #
-                # 
-                # Reason: dictionary creation from enumerate (json)
-
-                # MEM START
-                mem1_art = time.time()
-
                 # channel id
                 response['channel_id'] = item['peer_id']['channel_id']
 
                 # message id
                 msg_id = item['id']
                 response['msg_id'] = msg_id
-
+                response['grouped_id'] = None if 'grouped_id' not in item or item['grouped_id'] is None else item['grouped_id'] 
+                
                 # add attrs
                 response['message'] = item['message']
 
@@ -339,27 +328,6 @@ def main():
                 response['venue_provider'] = None
                 response = get_geo_attrs(item['media'], response)
 
-                # ------- END ------ #
-                #  Memory Profiling  #
-                # ################## #
-
-                # MEM STOP
-
-                mem1_op = time.time()
-                mem1_time = mem1_op - mem1_art
-
-                # debug statements:
-
-                # ----- START ------ #
-                #  Memory Profiling  #
-                # ################## #
-                # 
-                # Reason: json deserialization from response objects
-
-                # MEM START
-                
-                mem2_art = time.time()
-
                 # build appropriate response:
                 # note: this acts as a filter AND an entry to json deserialization
                 finals = TGResponse(response)
@@ -371,13 +339,9 @@ def main():
                 finals = msgspec.json.decode(finals)
                 
                 # Might need to bring this back later?
-                #####
                 #finals = msgspec.json.encode(finals)
                 
                 testing['msg'].append(finals)
-                # MEM STOP
-                mem2_op = time.time()
-                mem2_time = mem2_op-mem2_art
 
                 # ------- END ------ #
                 #  Memory Profiling  #
@@ -394,8 +358,8 @@ def main():
         print('Writing .csv...')
         print('\n')
 
-        with open(msgs_file_path, mode='w', newline='') as file:
-            
+        with open(msgs_file_path, mode='a+', newline='') as file:
+
             h2 = testing['msg'][0]
             h1 = h2['channel_name']
             h0 = h1.keys()
@@ -410,15 +374,14 @@ def main():
         print('-- END --')
         print('')
 
+    data.to_excel(
+            chats_file_path.replace('.csv', '.xlsx'),
+            index=False
+            )
+
     # Save data
     chats_columns = chats_dataset_columns()
     data = data[chats_columns].copy()
-
-    data.to_excel(
-        chats_file_path.replace('.csv', '.xlsx'),
-        index=False
-    )
-
 
 if __name__ == "__main__":
     main()
