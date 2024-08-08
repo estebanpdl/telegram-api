@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# warnings
+import warnings
+warnings.filterwarnings('ignore')
+
 # Import modules
 import pandas as pd
 import asyncio
