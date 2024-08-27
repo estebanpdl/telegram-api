@@ -66,7 +66,7 @@ or
 pip3 install -r requirements.txt
 ```
 
-**Once you obtain an API ID and API hash on my.telegram.org, populate the `config/config.ini` file with the described values.**
+**Once you obtain an API ID and API hash on my.telegram.org, copy `config/config-sample.ini` to `config/config.ini` and fill in the described values.**
 
 ```ini
 
