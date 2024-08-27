@@ -127,13 +127,25 @@ client = loop.run_until_complete(
 # request type
 req_type, req_input = cmd_request_type(args)
 if req_type == 'batch':
-	req_input = [
-		i.rstrip() for i in open(
-			req_input, encoding='utf-8', mode='r'
-		)
-	]
+	# read batch file from tsv
+	batchDF = pd.read_csv(
+		req_input,
+		sep='\t',
+		header=None
+	)
+
+	# Replace NaN in column 1 with 0
+	batchDF[1] = batchDF[1].fillna(0)
+
+	# get channels
+	req_input = batchDF[0].tolist()
+	# Create a dict of channels and their start_id
+	if len(batchDF.columns) > 1:
+		start_ids = batchDF[1].tolist()
+		channel_start_ids = dict(zip(req_input, start_ids))
 else:
 	req_input = [req_input]
+	channel_start_ids = {req_input[0]: 0}
 
 # reading | Creating an output folder
 if args['output']:
@@ -233,6 +245,9 @@ for channel in req_input:
 		)
 
 		if not args['limit_download_to_channel_metadata']:
+			# Lookup start_id for channel
+			if channel in channel_start_ids:
+				args['min_id'] = channel_start_ids[channel]
 
 			# Collect posts
 			if not args['min_id']:
