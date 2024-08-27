@@ -264,7 +264,13 @@ for channel in req_input:
 			data = posts.to_dict()
 
 			# Get offset ID | Get messages
-			offset_id = min([i['id'] for i in data['messages']])
+			if len(data['messages']) > 0:
+				try:
+					offset_id = min([i['id'] for i in data['messages']])
+				except ValueError:
+					offset_id = None
+			else:
+				offset_id = None
 
 			while len(posts.messages) > 0:
 				
